@@ -1,0 +1,73 @@
+#include <WiFi.h>
+
+const char* ssid = "iPhoneHotspot";
+const char* password = "YOUR_WIFI_PASSWORD";
+const int LEDPin = 26;
+
+void connectWiFi() {
+  Serial.println();
+  Serial.println("กำลังเชื่อมต่อ WiFi...");
+  Serial.print("SSID: ");
+  Serial.println(ssid);
+
+  WiFi.mode(WIFI_STA);
+  WiFi.begin(ssid, password);
+
+  unsigned long start = millis();
+  const unsigned long timeoutMs = 20000;
+
+  while (WiFi.status() != WL_CONNECTED && millis() - start < timeoutMs) {
+    delay(500);
+    Serial.print(".");
+  }
+
+  Serial.println();
+
+  if (WiFi.status() == WL_CONNECTED) {
+    Serial.println("✅ เชื่อมต่อ WiFi สำเร็จ!");
+    Serial.print("📱 IP Address: ");
+    Serial.println(WiFi.localIP());
+  } else {
+    Serial.println("❌ ต่อ WiFi ไม่สำเร็จใน 20 วินาที");
+    Serial.print("WiFi status = ");
+    Serial.println(WiFi.status());
+  }
+}
+
+void setup() {
+  Serial.begin(115200);
+
+  pinMode(LEDPin, OUTPUT);
+  digitalWrite(LEDPin, LOW);
+
+  connectWiFi();
+
+  Serial.println("\n=== คำสั่งใช้งาน ===");
+  Serial.println("ON / OFF / STATUS");
+}
+
+void loop() {
+  if (WiFi.status() != WL_CONNECTED) {
+    connectWiFi();
+  }
+
+  if (Serial.available() > 0) {
+    String command = Serial.readStringUntil('\n');
+    command.trim();
+
+    if (command == "ON") {
+      digitalWrite(LEDPin, HIGH);
+      Serial.println("💡 เปิดไฟแล้ว!");
+    } else if (command == "OFF") {
+      digitalWrite(LEDPin, LOW);
+      Serial.println("🌙 ปิดไฟแล้ว!");
+    } else if (command == "STATUS") {
+      Serial.print("สถานะไฟ: ");
+      Serial.println(digitalRead(LEDPin) == HIGH ? "เปิด" : "ปิด");
+    } else {
+      Serial.println("❌ คำสั่งไม่ถูกต้อง");
+    }
+  }
+
+  delay(100);
+}
