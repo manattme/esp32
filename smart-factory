@@ -1,0 +1,185 @@
+#include <WiFi.h>
+#include <LittleFS.h>
+#include <ESPAsyncWebServer.h>
+
+// ===== Pins =====
+#define LED_READY 32
+#define RELAY_S1 23
+#define RELAY_S2 18
+#define RELAY_S3 19
+
+// LED OUTPUT (ไฟบนบอร์ด)
+const int LED_ENTRY  = 25;   // S1
+const int LED_VISION = 27;   // S2
+const int LED_SORT   = 26;   // S3
+
+// SENSOR INPUT (ต่อ sensor จริง)
+const int SENSOR_ENTRY  = 2;
+const int SENSOR_VISION = 35; // input-only ok
+const int SENSOR_SORT   = 33;
+
+// ===== Config sensor logic =====
+// ถ้า sensor ของคุณ "เจอชิ้นงานแล้วเป็น LOW" ให้ใช้ true (แนะนำเริ่มที่ true)
+const bool SENSOR_ACTIVE_LOW = true;
+
+// WiFi
+const char* ssid = "iPhoneHotspot";
+const char* password = "0405sunny";
+
+AsyncWebServer server(80);
+
+// สถานะระบบ
+volatile bool running = false;
+
+// อ่าน sensor แล้วแปลงเป็น boolean "detected"
+bool readDetected(int pin) {
+  int raw = digitalRead(pin);
+  return SENSOR_ACTIVE_LOW ? (raw == LOW) : (raw == HIGH);
+}
+
+void setup() {
+  Serial.begin(115200);
+
+  if (!LittleFS.begin(true)) {
+    Serial.println("LittleFS Mount Failed");
+    return;
+  }
+
+  // Relay
+  pinMode(RELAY_S1, OUTPUT);
+  pinMode(RELAY_S2, OUTPUT);
+  pinMode(RELAY_S3, OUTPUT);
+  digitalWrite(RELAY_S1, LOW);
+  digitalWrite(RELAY_S2, LOW);
+  digitalWrite(RELAY_S3, LOW);
+
+  // LEDs
+  pinMode(LED_ENTRY, OUTPUT);
+  pinMode(LED_VISION, OUTPUT);
+  pinMode(LED_SORT, OUTPUT);
+  digitalWrite(LED_ENTRY, LOW);
+  digitalWrite(LED_VISION, LOW);
+  digitalWrite(LED_SORT, LOW);
+
+  // Sensors
+  // ถ้าเป็น sensor แบบ open-collector / สวิตช์ทั่วไป แนะนำ INPUT_PULLUP
+  // แต่ GPIO35 ไม่มี pullup ภายใน -> ต้องมี pullup ภายนอก (10k ไป 3.3V) ถ้าใช้ active-low
+  pinMode(SENSOR_ENTRY, INPUT_PULLUP);
+  pinMode(SENSOR_VISION, INPUT);       // GPIO35 ไม่มี PULLUP ในชิป
+  pinMode(SENSOR_SORT, INPUT_PULLUP);
+
+  // WiFi
+  WiFi.begin(ssid, password);
+  Serial.print("Connecting WiFi");
+  while (WiFi.status() != WL_CONNECTED) {
+    delay(500);
+    Serial.print(".");
+  }
+  Serial.println("\nWiFi connected");
+  Serial.println(WiFi.localIP());
+
+  pinMode(LED_READY, OUTPUT);
+  digitalWrite(LED_READY, HIGH);
+
+  // Serve UI
+  server.on("/", HTTP_GET, [](AsyncWebServerRequest *request) {
+    request->send(LittleFS, "/index.html", "text/html");
+  });
+  server.serveStatic("/", LittleFS, "/");
+
+  // ===== Control endpoints for HTML =====
+  server.on("/start", HTTP_GET, [](AsyncWebServerRequest *request){
+    running = true;
+
+    // ถ้าต้องการให้เริ่มงานแล้ว “เปิดรีเลย์ทั้งหมดพร้อมกัน”
+    digitalWrite(RELAY_S1, HIGH);
+    digitalWrite(RELAY_S2, HIGH);
+    digitalWrite(RELAY_S3, HIGH);
+
+    request->send(200, "text/plain", "START");
+  });
+
+  server.on("/stop", HTTP_GET, [](AsyncWebServerRequest *request){
+    running = false;
+
+    // หยุดงาน ปิดรีเลย์ทั้งหมด
+    digitalWrite(RELAY_S1, LOW);
+    digitalWrite(RELAY_S2, LOW);
+    digitalWrite(RELAY_S3, LOW);
+
+    // LED จะถูก loop อัปเดต แต่เพื่อความชัด ปิดทันที
+    digitalWrite(LED_ENTRY, LOW);
+    digitalWrite(LED_VISION, LOW);
+    digitalWrite(LED_SORT, LOW);
+
+    request->send(200, "text/plain", "STOP");
+  });
+
+  // (ทางเลือก) คุมรีเลย์แยกตัว
+  server.on("/s1/on", HTTP_GET, [](AsyncWebServerRequest *request){
+    digitalWrite(RELAY_S1, HIGH);
+    request->send(200, "text/plain", "S1 ON");
+  });
+  server.on("/s1/off", HTTP_GET, [](AsyncWebServerRequest *request){
+    digitalWrite(RELAY_S1, LOW);
+    request->send(200, "text/plain", "S1 OFF");
+  });
+
+  server.on("/s2/on", HTTP_GET, [](AsyncWebServerRequest *request){
+    digitalWrite(RELAY_S2, HIGH);
+    request->send(200, "text/plain", "S2 ON");
+  });
+  server.on("/s2/off", HTTP_GET, [](AsyncWebServerRequest *request){
+    digitalWrite(RELAY_S2, LOW);
+    request->send(200, "text/plain", "S2 OFF");
+  });
+
+  server.on("/s3/on", HTTP_GET, [](AsyncWebServerRequest *request){
+    digitalWrite(RELAY_S3, HIGH);
+    request->send(200, "text/plain", "S3 ON");
+  });
+  server.on("/s3/off", HTTP_GET, [](AsyncWebServerRequest *request){
+    digitalWrite(RELAY_S3, LOW);
+    request->send(200, "text/plain", "S3 OFF");
+  });
+
+  // ===== Status endpoint ให้ HTML ดึงไปแสดง =====
+  server.on("/status", HTTP_GET, [](AsyncWebServerRequest *request){
+    bool s1 = readDetected(SENSOR_ENTRY);
+    bool s2 = readDetected(SENSOR_VISION);
+    bool s3 = readDetected(SENSOR_SORT);
+
+    // JSON แบบง่าย (ไม่ต้องใช้ไลบรารีเพิ่ม)
+    String json = "{";
+    json += "\"running\":" + String(running ? "true" : "false") + ",";
+    json += "\"s1\":" + String(s1 ? "true" : "false") + ",";
+    json += "\"s2\":" + String(s2 ? "true" : "false") + ",";
+    json += "\"s3\":" + String(s3 ? "true" : "false") + ",";
+    json += "\"r1\":" + String(digitalRead(RELAY_S1) ? "true" : "false") + ",";
+    json += "\"r2\":" + String(digitalRead(RELAY_S2) ? "true" : "false") + ",";
+    json += "\"r3\":" + String(digitalRead(RELAY_S3) ? "true" : "false");
+    json += "}";
+
+    request->send(200, "application/json", json);
+  });
+
+  server.begin();
+}
+
+void loop() {
+  if (!running) {
+    delay(30);
+    return;
+  }
+
+  // อ่าน sensor แล้วคุม LED ตาม sensor จริง
+  bool s1 = readDetected(SENSOR_ENTRY);
+  bool s2 = readDetected(SENSOR_VISION);
+  bool s3 = readDetected(SENSOR_SORT);
+
+  digitalWrite(LED_ENTRY,  s1 ? HIGH : LOW);
+  digitalWrite(LED_VISION, s2 ? HIGH : LOW);
+  digitalWrite(LED_SORT,   s3 ? HIGH : LOW);
+
+  delay(20);
+}
