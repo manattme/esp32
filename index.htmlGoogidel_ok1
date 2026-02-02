@@ -1,0 +1,1928 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smart Factory 4.0 - AI Era</title>
+    <script src="https://cdn.plot.ly/plotly-2.27.0.min.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #0a0e1a 0%, #1a1f35 100%);
+            overflow: hidden;
+            height: 100vh;
+        }
+
+        .container {
+            display: grid;
+            grid-template-columns: 300px 1fr 340px;
+            grid-template-rows: 90px 1fr 270px;
+            gap: 18px;
+            padding: 18px;
+            height: 100vh;
+        }
+
+        /* Header - Futuristic Cyber Style */
+        .header {
+            grid-column: 1 / -1;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+            border-radius: 20px;
+            padding: 24px 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 15px 50px rgba(102, 126, 234, 0.4),
+                        0 0 0 1px rgba(255,255,255,0.1) inset;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .header::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
+            animation: shimmer 3s infinite;
+        }
+
+        @keyframes shimmer {
+            0%, 100% { transform: translateX(-100%); }
+            50% { transform: translateX(100%); }
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            z-index: 1;
+        }
+
+        .logo-icon {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, #00f5ff 0%, #0066ff 100%);
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 32px;
+            box-shadow: 0 8px 25px rgba(0, 245, 255, 0.4),
+                        0 0 0 2px rgba(255,255,255,0.2);
+            animation: float 3s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-5px); }
+        }
+
+        .logo-text h1 {
+            font-size: 28px;
+            color: white;
+            font-weight: 800;
+            margin-bottom: 4px;
+            letter-spacing: -0.5px;
+            text-shadow: 0 2px 10px rgba(0,0,0,0.3);
+        }
+
+        .logo-text p {
+            font-size: 13px;
+            color: rgba(255,255,255,0.95);
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            margin-bottom: 4px;
+        }
+
+        .logo-text .credit {
+            font-size: 13px;
+            color: #ffd700;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            text-shadow: 0 2px 8px rgba(255, 215, 0, 0.6);
+        }
+
+        .system-status {
+            display: flex;
+            gap: 30px;
+            z-index: 1;
+        }
+
+        .status-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            background: rgba(255,255,255,0.15);
+            padding: 12px 20px;
+            border-radius: 30px;
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255,255,255,0.25);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+
+        .status-led {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #00f5ff;
+            box-shadow: 0 0 15px #00f5ff,
+                        0 0 30px rgba(0, 245, 255, 0.5);
+            animation: pulse-glow 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse-glow {
+            0%, 100% {
+                opacity: 1;
+                transform: scale(1);
+                box-shadow: 0 0 15px #00f5ff, 0 0 30px rgba(0, 245, 255, 0.5);
+            }
+            50% {
+                opacity: 0.8;
+                transform: scale(1.2);
+                box-shadow: 0 0 20px #00f5ff, 0 0 40px rgba(0, 245, 255, 0.8);
+            }
+        }
+
+        .status-text {
+            font-size: 14px;
+            color: white;
+            font-weight: 700;
+            letter-spacing: 0.3px;
+            text-shadow: 0 1px 3px rgba(0,0,0,0.2);
+        }
+
+        .header-right {
+            text-align: right;
+            z-index: 1;
+        }
+
+        .time {
+            font-size: 28px;
+            color: white;
+            font-weight: 800;
+            font-family: 'SF Mono', 'Courier New', monospace;
+            letter-spacing: -0.5px;
+            text-shadow: 0 2px 10px rgba(0,0,0,0.3);
+        }
+
+        .date {
+            font-size: 13px;
+            color: rgba(255,255,255,0.95);
+            font-weight: 600;
+            margin-top: 3px;
+        }
+
+        /* Control Panel - Modern Glass */
+        .control-panel {
+            background: linear-gradient(135deg, rgba(15, 23, 42, 0.95) 0%, rgba(30, 41, 59, 0.95) 100%);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.3),
+                        0 0 0 1px rgba(102, 126, 234, 0.2) inset;
+            overflow-y: auto;
+            backdrop-filter: blur(20px);
+        }
+
+        .panel-title {
+            font-size: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            font-weight: 800;
+            margin-bottom: 30px;
+            padding-bottom: 18px;
+            border-bottom: 2px solid rgba(102, 126, 234, 0.3);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            letter-spacing: -0.3px;
+        }
+
+        .control-group { margin-bottom: 24px; }
+
+        .control-label {
+            font-size: 12px;
+            color: rgba(255,255,255,0.7);
+            font-weight: 700;
+            margin-bottom: 12px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .btn {
+            width: 100%;
+            padding: 18px;
+            border: none;
+            border-radius: 14px;
+            font-size: 14px;
+            font-weight: 800;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            box-shadow: 0 6px 20px rgba(0,0,0,0.2);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: 50%; left: 50%;
+            width: 0; height: 0;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.2);
+            transform: translate(-50%, -50%);
+            transition: width 0.6s, height 0.6s;
+        }
+
+        .btn:active::before { width: 300px; height: 300px; }
+
+        .btn-start {
+            background: linear-gradient(135deg, #00f5ff 0%, #0066ff 100%);
+            color: white;
+            box-shadow: 0 6px 20px rgba(0, 245, 255, 0.4);
+        }
+
+        .btn-start:hover:not(:disabled) {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 35px rgba(0, 245, 255, 0.5);
+        }
+
+        .btn-start:disabled {
+            background: linear-gradient(135deg, #374151 0%, #1f2937 100%);
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .btn-stop {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+            box-shadow: 0 6px 20px rgba(245, 87, 108, 0.4);
+        }
+
+        .btn-stop:hover:not(:disabled) {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 35px rgba(245, 87, 108, 0.5);
+        }
+
+        .btn-reset {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-reset:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 35px rgba(102, 126, 234, 0.5);
+        }
+
+        .btn-emergency {
+            background: linear-gradient(135deg, #ff6b6b 0%, #feca57 100%);
+            color: white;
+            font-size: 16px;
+            padding: 24px;
+            border: 2px solid rgba(255,255,255,0.2);
+            box-shadow: 0 6px 20px rgba(255, 107, 107, 0.4);
+        }
+
+        .btn-emergency:hover {
+            transform: translateY(-3px) scale(1.02);
+            box-shadow: 0 12px 40px rgba(255, 107, 107, 0.6);
+        }
+
+        .btn-emergency.active { animation: emergency-flash 1s infinite; }
+
+        @keyframes emergency-flash {
+            0%, 100% {
+                background: linear-gradient(135deg, #ff6b6b 0%, #feca57 100%);
+                box-shadow: 0 6px 20px rgba(255, 107, 107, 0.4);
+            }
+            50% {
+                background: linear-gradient(135deg, #feca57 0%, #ff6b6b 100%);
+                box-shadow: 0 12px 40px rgba(254, 202, 87, 0.8);
+            }
+        }
+
+        .slider {
+            width: 100%;
+            height: 10px;
+            border-radius: 5px;
+            background: linear-gradient(90deg, rgba(102, 126, 234, 0.2) 0%, rgba(118, 75, 162, 0.2) 100%);
+            outline: none;
+            -webkit-appearance: none;
+        }
+
+        .slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 26px; height: 26px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.6),
+                        0 0 0 3px rgba(255,255,255,0.2);
+            border: 2px solid white;
+        }
+
+        .slider-value {
+            text-align: center;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            font-size: 26px;
+            font-weight: 800;
+            margin-top: 14px;
+            font-family: 'SF Mono', monospace;
+            letter-spacing: -0.5px;
+        }
+
+        /* Production Area */
+        .production-area {
+            background: linear-gradient(135deg, rgba(15, 23, 42, 0.95) 0%, rgba(30, 41, 59, 0.95) 100%);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.3),
+                        0 0 0 1px rgba(102, 126, 234, 0.2) inset;
+            position: relative;
+            overflow: visible;
+            backdrop-filter: blur(20px);
+        }
+
+        .production-line { position: relative; width: 100%; height: 100%; }
+
+        .conveyor {
+            position: absolute;
+            top: 50%;
+            left: 10%;
+            right: 10%;
+            height: 110px;
+            transform: translateY(-50%);
+            background: linear-gradient(180deg, #1e293b 0%, #334155 50%, #1e293b 100%);
+            border: 4px solid;
+            border-image: linear-gradient(90deg, #667eea, #764ba2, #f093fb) 1;
+            border-radius: 16px;
+            box-shadow: inset 0 -10px 30px rgba(0,0,0,0.5),
+                        0 10px 40px rgba(102, 126, 234, 0.2),
+                        0 0 30px rgba(118, 75, 162, 0.1);
+            overflow: hidden;
+        }
+
+        .conveyor-pattern {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background: repeating-linear-gradient(
+                90deg,
+                transparent 0px,
+                transparent 48px,
+                rgba(102, 126, 234, 0.15) 48px,
+                rgba(102, 126, 234, 0.15) 52px
+            );
+        }
+
+        .conveyor.running .conveyor-pattern { animation: conveyor-slide 2s linear infinite; }
+
+        @keyframes conveyor-slide {
+            from { transform: translateX(-52px); }
+            to { transform: translateX(0); }
+        }
+
+        .motor-unit {
+            position: absolute;
+            top: 50%;
+            left: 6%;
+            transform: translate(-50%, -50%);
+            z-index: 50;
+        }
+
+        .motor {
+            width: 85px;
+            height: 85px;
+            background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
+            border-radius: 50%;
+            border: 5px solid;
+            border-image: linear-gradient(135deg, #00f5ff, #0066ff) 1;
+            box-shadow: 0 12px 40px rgba(0, 245, 255, 0.4),
+                        0 0 40px rgba(0, 102, 255, 0.3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+
+        .motor::before {
+            content: '';
+            position: absolute;
+            inset: -5px;
+            border-radius: 50%;
+            padding: 5px;
+            background: linear-gradient(135deg, #00f5ff, #0066ff);
+            -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+            -webkit-mask-composite: xor;
+            mask-composite: exclude;
+            animation: rotate 3s linear infinite;
+        }
+
+        .motor-core {
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(135deg, #00f5ff 0%, #0066ff 100%);
+            border-radius: 50%;
+            box-shadow: 0 0 30px rgba(0, 245, 255, 0.8),
+                        inset 0 3px 15px rgba(0,0,0,0.4);
+        }
+
+        .motor.running .motor-core { animation: motor-spin 1.5s linear infinite; }
+
+        @keyframes motor-spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+        @keyframes rotate { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+
+        .inverter {
+            margin-top: 14px;
+            background: linear-gradient(135deg, #0066ff 0%, #0052cc 100%);
+            padding: 11px 16px;
+            border-radius: 10px;
+            text-align: center;
+            color: white;
+            font-size: 12px;
+            font-weight: 800;
+            box-shadow: 0 6px 20px rgba(0, 102, 255, 0.4);
+            letter-spacing: 0.5px;
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+
+        .sensor {
+            position: absolute;
+            width: 46px;
+            height: 62px;
+            top: 24%;
+            z-index: 55;
+        }
+
+        .sensor-body {
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
+            border: 3px solid #d97706;
+            border-radius: 12px;
+            box-shadow: 0 8px 25px rgba(251, 191, 36, 0.4);
+            position: relative;
+        }
+
+        .sensor-label {
+            position: absolute;
+            top: -34px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: linear-gradient(135deg, rgba(251, 191, 36, 0.2) 0%, rgba(245, 158, 11, 0.2) 100%);
+            padding: 7px 16px;
+            border-radius: 10px;
+            font-size: 11px;
+            font-weight: 800;
+            color: #fbbf24;
+            border: 2px solid rgba(251, 191, 36, 0.5);
+            white-space: nowrap;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            letter-spacing: 0.3px;
+            backdrop-filter: blur(10px);
+        }
+
+        .sensor-led {
+            position: absolute;
+            bottom: 14px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 22px;
+            height: 22px;
+            background: #1e293b;
+            border-radius: 50%;
+            border: 3px solid #0f172a;
+            box-shadow: inset 0 2px 8px rgba(0,0,0,0.7);
+            transition: all 0.3s;
+        }
+
+        .sensor.active .sensor-led {
+            background: #00f5ff;
+            border-color: #0066ff;
+            box-shadow: 0 0 40px #00f5ff,
+                        0 0 20px rgba(0, 245, 255, 0.8),
+                        inset 0 0 15px rgba(255,255,255,0.6);
+            animation: sensor-pulse 0.7s;
+        }
+
+        @keyframes sensor-pulse {
+            0%, 100% { transform: translateX(-50%) scale(1); }
+            50% { transform: translateX(-50%) scale(1.5); }
+        }
+
+        .sensor-beam {
+            position: absolute;
+            width: 6px;
+            top: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            height: 200px;
+            background: linear-gradient(to bottom, rgba(0, 245, 255, 0.9), transparent);
+            opacity: 0;
+            box-shadow: 0 0 30px rgba(0, 245, 255, 1);
+            transition: opacity 0.3s;
+        }
+
+        .sensor.active .sensor-beam { opacity: 1; }
+
+        #sensor1 { left: 22%; }
+        #sensor2 { left: 50%; }
+        #sensor3 { left: 78%; }
+
+        .ai-camera {
+            position: absolute;
+            top: 8%;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 55;
+        }
+
+        .camera-mount {
+            width: 130px;
+            height: 95px;
+            background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
+            border-radius: 16px;
+            border: 3px solid;
+            border-image: linear-gradient(135deg, #667eea, #764ba2) 1;
+            box-shadow: 0 12px 40px rgba(102, 126, 234, 0.4);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+
+        .camera-mount::before {
+            content: '';
+            position: absolute;
+            inset: -3px;
+            border-radius: 16px;
+            padding: 3px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+            -webkit-mask-composite: xor;
+            mask-composite: exclude;
+        }
+
+        .camera-lens {
+            width: 65px;
+            height: 65px;
+            border-radius: 50%;
+            background: radial-gradient(circle, #667eea 0%, #764ba2 100%);
+            border: 4px solid #4c51bf;
+            box-shadow: 0 0 35px rgba(102, 126, 234, 1),
+                        inset 0 0 30px rgba(255,255,255,0.4);
+        }
+
+        .camera.scanning .camera-lens { animation: camera-scan 2s infinite; }
+
+        @keyframes camera-scan {
+            0%, 100% { box-shadow: 0 0 35px rgba(102, 126, 234, 1); }
+            50% { box-shadow: 0 0 60px rgba(118, 75, 162, 1), 0 0 90px rgba(240, 147, 251, 0.7); }
+        }
+
+        .camera-label {
+            position: absolute;
+            bottom: -30px;
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.2) 0%, rgba(118, 75, 162, 0.2) 100%);
+            padding: 7px 20px;
+            border-radius: 10px;
+            font-size: 12px;
+            font-weight: 800;
+            color: #667eea;
+            border: 2px solid rgba(102, 126, 234, 0.5);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            letter-spacing: 0.3px;
+            backdrop-filter: blur(10px);
+        }
+
+        .plc-controller {
+            position: absolute;
+            bottom: 4%;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 55;
+        }
+
+        .plc-box {
+            width: 150px;
+            height: 100px;
+            background: linear-gradient(135deg, #00f5ff 0%, #0066ff 100%);
+            border: 3px solid rgba(255,255,255,0.3);
+            border-radius: 14px;
+            box-shadow: 0 12px 40px rgba(0, 245, 255, 0.4);
+            padding: 16px;
+        }
+
+        .plc-display {
+            height: 40px;
+            background: #0a0e1a;
+            border: 3px solid #1a1a2e;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #00f5ff;
+            font-family: 'SF Mono', 'Courier New', monospace;
+            font-size: 15px;
+            font-weight: 800;
+            margin-bottom: 16px;
+            box-shadow: inset 0 3px 12px rgba(0,0,0,0.8),
+                        0 0 25px rgba(0, 245, 255, 0.4);
+            letter-spacing: 1px;
+        }
+
+        .plc-leds { display: flex; gap: 16px; justify-content: center; }
+
+        .plc-led {
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            background: #1a1a2e;
+            border: 2px solid #2a2a3e;
+            box-shadow: inset 0 2px 6px rgba(0,0,0,0.7);
+        }
+
+        .plc-led.on {
+            background: #00f5ff;
+            border-color: #0066ff;
+            box-shadow: 0 0 25px #00f5ff,
+                        0 0 15px rgba(0, 245, 255, 0.6),
+                        inset 0 0 12px rgba(255,255,255,0.6);
+        }
+
+        .plc-led.error {
+            background: #f5576c;
+            border-color: #f093fb;
+            box-shadow: 0 0 25px #f5576c;
+            animation: blink 0.7s infinite;
+        }
+
+        @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.4} }
+
+        .sorting-stations {
+            position: absolute;
+            right: 2%;
+            top: 50%;
+            transform: translateY(-50%);
+            display: flex;
+            flex-direction: column;
+            gap: 60px;
+            z-index: 45;
+        }
+
+        .station { display: flex; flex-direction: column; align-items: center; }
+
+        .actuator { display: flex; flex-direction: column; align-items: center; margin-bottom: 12px; }
+
+        .solenoid {
+            width: 54px;
+            height: 32px;
+            background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
+            border: 3px solid #d97706;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 12px;
+            font-weight: 800;
+            box-shadow: 0 6px 20px rgba(251, 191, 36, 0.4);
+            margin-bottom: 10px;
+            text-shadow: 0 1px 3px rgba(0,0,0,0.4);
+            letter-spacing: 0.5px;
+        }
+
+        .actuator.active .solenoid { box-shadow: 0 0 40px #fbbf24; animation: spark 0.6s; }
+
+        @keyframes spark {
+            0%,100%{transform:scale(1)}
+            50%{transform:scale(1.15); background: linear-gradient(135deg, #fde047 0%, #fbbf24 100%);}
+        }
+
+        .cylinder-body {
+            width: 75px;
+            height: 34px;
+            background: linear-gradient(135deg, #64748b 0%, #475569 100%);
+            border: 3px solid #334155;
+            border-radius: 10px;
+            position: relative;
+            box-shadow: 0 6px 20px rgba(0,0,0,0.4);
+        }
+
+        .cylinder-body::before,
+        .cylinder-body::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 8px;
+            height: 20px;
+            background: #94a3b8;
+            border-radius: 3px;
+            box-shadow: inset 0 1px 5px rgba(0,0,0,0.7);
+        }
+
+        .cylinder-body::before { left: 12px; }
+        .cylinder-body::after { right: 12px; }
+
+        .cylinder-rod {
+            width: 16px;
+            height: 42px;
+            background: linear-gradient(180deg, #94a3b8 0%, #64748b 100%);
+            border: 3px solid #475569;
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+            top: 100%;
+            transition: height 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+            border-radius: 0 0 6px 6px;
+            box-shadow: 0 6px 18px rgba(0,0,0,0.5);
+        }
+
+        .actuator.active .cylinder-rod { height: 110px; }
+
+        .pusher-plate {
+            width: 58px;
+            height: 16px;
+            background: linear-gradient(135deg, #f97316 0%, #ea580c 100%);
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+            bottom: -5px;
+            border-radius: 6px;
+            border: 3px solid #c2410c;
+            box-shadow: 0 6px 20px rgba(249, 115, 22, 0.5);
+        }
+
+        .bin {
+            width: 130px;
+            height: 130px;
+            border: 5px solid;
+            border-radius: 16px;
+            padding: 12px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: space-around;
+            box-shadow: 0 12px 40px;
+            background: linear-gradient(135deg, rgba(15, 23, 42, 0.5) 0%, rgba(30, 41, 59, 0.5) 100%);
+            backdrop-filter: blur(10px);
+        }
+
+        .bin-ng { border-color: #f5576c; box-shadow: 0 12px 40px rgba(245, 87, 108, 0.4); }
+        .bin-good { border-color: #00f5ff; box-shadow: 0 12px 40px rgba(0, 245, 255, 0.4); }
+
+        .bin-icon { font-size: 32px; filter: drop-shadow(0 4px 8px rgba(0,0,0,0.3)); line-height: 1; }
+
+        .bin-label {
+            font-size: 14px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 1.2px;
+            line-height: 1;
+        }
+
+        .bin-ng .bin-label { color: #f5576c; text-shadow: 0 0 10px rgba(245, 87, 108, 0.5); }
+        .bin-good .bin-label { color: #00f5ff; text-shadow: 0 0 10px rgba(0, 245, 255, 0.5); }
+
+        .bin-count { font-size: 32px; font-weight: 800; font-family: 'SF Mono', 'Courier New', monospace; line-height: 1; }
+        .bin-ng .bin-count { color: #f5576c; text-shadow: 0 0 15px rgba(245, 87, 108, 0.6); }
+        .bin-good .bin-count { color: #00f5ff; text-shadow: 0 0 15px rgba(0, 245, 255, 0.6); }
+
+        .part {
+            position: absolute;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            top: 50%;
+            transform: translateY(-50%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            font-weight: 800;
+            color: white;
+            z-index: 30;
+            border: 4px solid;
+            font-family: 'SF Mono', monospace;
+            box-shadow: 0 6px 25px;
+        }
+
+        .part.good {
+            background: linear-gradient(135deg, #00f5ff 0%, #0066ff 100%);
+            border-color: #0052cc;
+            box-shadow: 0 6px 25px rgba(0, 245, 255, 0.6);
+        }
+
+        .part.bad {
+            background: linear-gradient(135deg, #f5576c 0%, #f093fb 100%);
+            border-color: #e0447a;
+            box-shadow: 0 6px 25px rgba(245, 87, 108, 0.6);
+        }
+
+        .metrics-panel {
+            background: linear-gradient(135deg, rgba(15, 23, 42, 0.95) 0%, rgba(30, 41, 59, 0.95) 100%);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.3),
+                        0 0 0 1px rgba(102, 126, 234, 0.2) inset;
+            overflow-y: auto;
+            backdrop-filter: blur(20px);
+        }
+
+        .metric-card {
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%);
+            border-radius: 16px;
+            padding: 22px;
+            margin-bottom: 22px;
+            border: 2px solid rgba(102, 126, 234, 0.3);
+            transition: all 0.3s;
+            backdrop-filter: blur(10px);
+        }
+
+        .metric-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 35px rgba(102, 126, 234, 0.3);
+            border-color: rgba(102, 126, 234, 0.5);
+        }
+
+        .metric-title {
+            font-size: 12px;
+            color: rgba(255,255,255,0.7);
+            font-weight: 800;
+            text-transform: uppercase;
+            margin-bottom: 16px;
+            letter-spacing: 1px;
+        }
+
+        .metric-value {
+            font-size: 42px;
+            font-weight: 800;
+            font-family: 'SF Mono', monospace;
+            text-align: center;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            letter-spacing: -1px;
+        }
+
+        .metric-subvalue {
+            font-size: 12px;
+            color: rgba(255,255,255,0.6);
+            text-align: center;
+            margin-top: 10px;
+            font-weight: 700;
+            letter-spacing: 0.3px;
+        }
+
+        .oee-gauge {
+            width: 170px;
+            height: 170px;
+            margin: 22px auto;
+            position: relative;
+        }
+
+        .gauge-svg { transform: rotate(-90deg); filter: drop-shadow(0 0 10px rgba(102, 126, 234, 0.5)); }
+
+        .gauge-bg { fill: none; stroke: rgba(102, 126, 234, 0.2); stroke-width: 18; }
+
+        .gauge-fill {
+            fill: none;
+            stroke: url(#gaugeGradient);
+            stroke-width: 18;
+            stroke-linecap: round;
+            transition: stroke-dashoffset 1.2s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .gauge-center {
+            position: absolute;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+        }
+
+        .gauge-value {
+            font-size: 38px;
+            font-weight: 800;
+            font-family: 'SF Mono', monospace;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            letter-spacing: -1px;
+            filter: drop-shadow(0 0 10px rgba(102, 126, 234, 0.5));
+        }
+
+        .gauge-label {
+            font-size: 13px;
+            color: rgba(255,255,255,0.7);
+            font-weight: 700;
+            letter-spacing: 1px;
+        }
+
+        .charts-area {
+            grid-column: 1 / -1;
+            background: linear-gradient(135deg, rgba(15, 23, 42, 0.95) 0%, rgba(30, 41, 59, 0.95) 100%);
+            border-radius: 20px;
+            padding: 26px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.3),
+                        0 0 0 1px rgba(102, 126, 234, 0.2) inset;
+            backdrop-filter: blur(20px);
+        }
+
+        .charts-container {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 20px;
+            height: 100%;
+        }
+
+        .chart-box {
+            background: linear-gradient(135deg, #0a0e1a 0%, #1a1f35 100%);
+            border-radius: 16px;
+            padding: 16px;
+            border: 2px solid rgba(102, 126, 234, 0.3);
+            box-shadow: 0 0 30px rgba(102, 126, 234, 0.2),
+                        inset 0 0 40px rgba(118, 75, 162, 0.05);
+        }
+
+        .chart-title {
+            font-size: 13px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            font-weight: 800;
+            margin-bottom: 14px;
+            text-align: center;
+            text-transform: uppercase;
+            letter-spacing: 1.2px;
+            font-family: 'SF Mono', monospace;
+        }
+
+        .chart { height: calc(100% - 42px); }
+
+        .alerts-container {
+            position: fixed;
+            top: 120px;
+            right: 26px;
+            width: 420px;
+            z-index: 1000;
+        }
+
+        .alert {
+            background: linear-gradient(135deg, rgba(15, 23, 42, 0.98) 0%, rgba(30, 41, 59, 0.98) 100%);
+            border-left: 5px solid;
+            border-radius: 14px;
+            padding: 22px;
+            margin-bottom: 16px;
+            box-shadow: 0 12px 40px rgba(0,0,0,0.2);
+            animation: slideIn 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+            backdrop-filter: blur(20px);
+            border-right: 1px solid rgba(255,255,255,0.1);
+            border-top: 1px solid rgba(255,255,255,0.1);
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+
+        @keyframes slideIn {
+            from { transform: translateX(450px); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        .alert-title { font-size: 16px; font-weight: 800; margin-bottom: 10px; letter-spacing: 0.3px; }
+
+        .alert-message { font-size: 14px; line-height: 1.6; font-weight: 600; color: rgba(255,255,255,0.8); }
+
+        .alert.info { border-left-color: #667eea; }
+        .alert.info .alert-title { color: #667eea; text-shadow: 0 0 10px rgba(102, 126, 234, 0.5); }
+
+        .alert.success { border-left-color: #00f5ff; }
+        .alert.success .alert-title { color: #00f5ff; text-shadow: 0 0 10px rgba(0, 245, 255, 0.5); }
+
+        .alert.warning { border-left-color: #fbbf24; }
+        .alert.warning .alert-title { color: #fbbf24; text-shadow: 0 0 10px rgba(251, 191, 36, 0.5); }
+
+        .alert.danger { border-left-color: #f5576c; }
+        .alert.danger .alert-title { color: #f5576c; text-shadow: 0 0 10px rgba(245, 87, 108, 0.5); }
+
+        ::-webkit-scrollbar { width: 12px; }
+        ::-webkit-scrollbar-track { background: rgba(15, 23, 42, 0.5); border-radius: 6px; }
+        ::-webkit-scrollbar-thumb {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 6px;
+            border: 2px solid rgba(15, 23, 42, 0.5);
+        }
+        ::-webkit-scrollbar-thumb:hover { background: linear-gradient(135deg, #764ba2 0%, #f093fb 100%); }
+    </style>
+</head>
+
+<body>
+<div class="container">
+    <!-- Header -->
+    <div class="header">
+        <div class="logo">
+            <div class="logo-icon">🏭</div>
+            <div class="logo-text">
+                <h1>Smart Factory 4.0</h1>
+                <p>AI-Powered Industrial Automation System</p>
+                <div class="credit">จัดทำโดย อาจารย์มนัส หมิดหวัง อาจารย์ประจำสาขาระบบอัตโนมัติและหุ่นยนต์(PNU)</div>
+            </div>
+        </div>
+
+        <div class="system-status">
+            <div class="status-item">
+                <div class="status-led"></div>
+                <span class="status-text">PLC Online</span>
+            </div>
+            <div class="status-item">
+                <div class="status-led"></div>
+                <span class="status-text">AI Ready</span>
+            </div>
+        </div>
+
+        <div class="header-right">
+            <div class="time" id="currentTime">14:30:00</div>
+            <div class="date" id="currentDate">15 มกราคม 2026</div>
+        </div>
+    </div>
+
+    <!-- Control Panel -->
+    <div class="control-panel">
+        <div class="panel-title">
+            <span>⚙️</span>
+            <span>ควบคุมระบบ</span>
+        </div>
+
+        <div class="control-group">
+            <div class="control-label">⚡ การทำงาน</div>
+            <button class="btn btn-start" id="btnStart" onclick="startProduction()">▶ เริ่มการผลิต</button>
+        </div>
+
+        <div class="control-group">
+            <button class="btn btn-stop" id="btnStop" onclick="stopProduction()" disabled>⏹ หยุดการผลิต</button>
+        </div>
+
+        <div class="control-group">
+            <button class="btn btn-reset" onclick="resetSystem()">🔄 รีเซ็ตระบบ</button>
+        </div>
+
+        <div class="control-group">
+            <button class="btn btn-emergency" id="btnEmergency" onclick="emergencyStop()">⚠️ ฉุกเฉิน E-STOP</button>
+        </div>
+
+        <div class="control-group">
+            <div class="control-label">⚙️ ความเร็วสายพาน</div>
+            <input type="range" min="10" max="100" value="50" class="slider" id="speedSlider" oninput="updateSpeed(this.value)">
+            <div class="slider-value"><span id="speedValue">50</span>%</div>
+        </div>
+
+        <div class="control-group">
+            <div class="control-label">🎯 อัตราของเสีย</div>
+            <input type="range" min="0" max="50" value="15" class="slider" id="defectSlider" oninput="updateDefectRate(this.value)">
+            <div class="slider-value"><span id="defectValue">15</span>%</div>
+        </div>
+    </div>
+
+    <!-- Production Area -->
+    <div class="production-area">
+        <div class="production-line" id="productionLine">
+            <div class="conveyor" id="conveyor">
+                <div class="conveyor-pattern"></div>
+            </div>
+
+            <div class="motor-unit">
+                <div class="motor" id="motor">
+                    <div class="motor-core"></div>
+                </div>
+                <div class="inverter">VFD</div>
+            </div>
+
+            <div class="sensor" id="sensor1">
+                <div class="sensor-body">
+                    <div class="sensor-label">S1: Entry</div>
+                    <div class="sensor-led"></div>
+                    <div class="sensor-beam"></div>
+                </div>
+            </div>
+
+            <div class="sensor" id="sensor2">
+                <div class="sensor-body">
+                    <div class="sensor-label">S2: QC</div>
+                    <div class="sensor-led"></div>
+                    <div class="sensor-beam"></div>
+                </div>
+            </div>
+
+            <div class="sensor" id="sensor3">
+                <div class="sensor-body">
+                    <div class="sensor-label">S3: Sort</div>
+                    <div class="sensor-led"></div>
+                    <div class="sensor-beam"></div>
+                </div>
+            </div>
+
+            <div class="ai-camera">
+                <div class="camera-mount">
+                    <div class="camera" id="camera">
+                        <div class="camera-lens"></div>
+                    </div>
+                    <div class="camera-label">AI Vision</div>
+                </div>
+            </div>
+
+            <div class="plc-controller">
+                <div class="plc-box">
+                    <div class="plc-display" id="plcDisplay">READY</div>
+                    <div class="plc-leds">
+                        <div class="plc-led" id="led1"></div>
+                        <div class="plc-led" id="led2"></div>
+                        <div class="plc-led" id="led3"></div>
+                        <div class="plc-led" id="led4"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="sorting-stations">
+                <div class="station station-ng">
+                    <div class="actuator" id="actuatorNG">
+                        <div class="solenoid">SOL</div>
+                        <div class="cylinder-body">
+                            <div class="cylinder-rod">
+                                <div class="pusher-plate"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="bin bin-ng">
+                        <div class="bin-icon">✗</div>
+                        <div class="bin-label">NG</div>
+                        <div class="bin-count" id="ngCount">0</div>
+                    </div>
+                </div>
+
+                <div class="station station-good">
+                    <div class="actuator" id="actuatorGood">
+                        <div class="solenoid">SOL</div>
+                        <div class="cylinder-body">
+                            <div class="cylinder-rod">
+                                <div class="pusher-plate"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="bin bin-good">
+                        <div class="bin-icon">✓</div>
+                        <div class="bin-label">GOOD</div>
+                        <div class="bin-count" id="goodCount">0</div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- Metrics Panel -->
+    <div class="metrics-panel">
+        <div class="panel-title">
+            <span>📊</span>
+            <span>ตัวชี้วัด</span>
+        </div>
+
+        <div class="metric-card">
+            <div class="metric-title">📦 ชิ้นงานทั้งหมด</div>
+            <div class="metric-value" id="totalParts">0</div>
+            <div class="metric-subvalue">Total Parts</div>
+        </div>
+
+        <div class="metric-card">
+            <div class="metric-title">✓ ชิ้นงานดี</div>
+            <div class="metric-value" id="goodParts">0</div>
+            <div class="metric-subvalue">Good Quality</div>
+        </div>
+
+        <div class="metric-card">
+            <div class="metric-title">✗ ของเสีย</div>
+            <div class="metric-value" id="defectParts">0</div>
+            <div class="metric-subvalue">Defects</div>
+        </div>
+
+        <div class="metric-card">
+            <div class="metric-title">💯 คุณภาพ</div>
+            <div class="metric-value" id="qualityRate">100%</div>
+            <div class="metric-subvalue">Quality Rate</div>
+        </div>
+
+        <div class="metric-card">
+            <div class="metric-title">⚡ อัตราการผลิต</div>
+            <div class="metric-value" id="productionRate">0</div>
+            <div class="metric-subvalue">Pieces/Min</div>
+        </div>
+
+        <div class="metric-card">
+            <div class="metric-title">🎯 ประสิทธิภาพ OEE</div>
+            <div class="oee-gauge">
+                <svg class="gauge-svg" width="170" height="170">
+                    <defs>
+                        <linearGradient id="gaugeGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                            <stop offset="0%" style="stop-color:#667eea;stop-opacity:1" />
+                            <stop offset="50%" style="stop-color:#764ba2;stop-opacity:1" />
+                            <stop offset="100%" style="stop-color:#f093fb;stop-opacity:1" />
+                        </linearGradient>
+                    </defs>
+                    <circle class="gauge-bg" cx="85" cy="85" r="75"></circle>
+                    <circle class="gauge-fill" cx="85" cy="85" r="75"
+                            stroke-dasharray="471" stroke-dashoffset="471" id="gaugeFill"></circle>
+                </svg>
+                <div class="gauge-center">
+                    <div class="gauge-value" id="oeeValue">0%</div>
+                    <div class="gauge-label">OEE</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Charts Area -->
+    <div class="charts-area">
+        <div class="charts-container">
+            <div class="chart-box">
+                <div class="chart-title">📈 PRODUCTION WAVEFORM</div>
+                <div class="chart" id="chartProduction"></div>
+            </div>
+            <div class="chart-box">
+                <div class="chart-title">📊 QUALITY SIGNAL</div>
+                <div class="chart" id="chartQuality"></div>
+            </div>
+            <div class="chart-box">
+                <div class="chart-title">🎯 DEFECT RADAR</div>
+                <div class="chart" id="chartDefects"></div>
+            </div>
+            <div class="chart-box">
+                <div class="chart-title">⚡ OEE PULSE</div>
+                <div class="chart" id="chartOEE"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="alerts-container" id="alertsContainer"></div>
+
+<script>
+    // =========================
+    // System State
+    // =========================
+    let systemState = {
+        running: false,
+        emergency: false,
+        speed: 50,
+        defectRate: 15,
+        partCounter: 0,
+        goodCount: 0,
+        badCount: 0,
+        productionInterval: null,
+        chartUpdateInterval: null,
+        startTime: null,
+        pollTimer: null
+    };
+
+    let chartData = {
+        production: { time: [], good: [], bad: [] },
+        quality: { time: [], rate: [] },
+        defects: { scratch: 0, crack: 0, deform: 0, color: 0, size: 0 },
+        oee: { time: [], value: [] }
+    };
+
+    // =========================
+    // API Helpers
+    // =========================
+    async function apiGet(path) {
+        const res = await fetch(path, { cache: 'no-store' });
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        return res;
+    }
+
+    function setPlcLed(num, on) {
+        const led = document.getElementById(`led${num}`);
+        if (led) led.classList.toggle('on', !!on);
+    }
+
+    function startStatusPolling() {
+        if (systemState.pollTimer) clearInterval(systemState.pollTimer);
+        systemState.pollTimer = setInterval(pollStatus, 400);
+        pollStatus();
+    }
+
+    async function pollStatus() {
+        try {
+            const res = await apiGet('/status');
+            const data = await res.json();
+
+            systemState.running = !!data.running;
+            systemState.emergency = !!data.emergency;
+
+            document.getElementById('btnStart').disabled = systemState.running || systemState.emergency;
+            document.getElementById('btnStop').disabled = !systemState.running;
+
+            document.getElementById('conveyor').classList.toggle('running', systemState.running);
+            document.getElementById('motor').classList.toggle('running', systemState.running);
+
+            if (systemState.emergency) {
+                document.getElementById('plcDisplay').textContent = 'E-STOP';
+                document.getElementById('btnEmergency').classList.add('active');
+                document.getElementById('led4').classList.add('error');
+            } else {
+                document.getElementById('btnEmergency').classList.remove('active');
+                document.getElementById('led4').classList.remove('error');
+                document.getElementById('plcDisplay').textContent = systemState.running ? 'RUNNING' : 'READY';
+            }
+        } catch (e) {
+            document.getElementById('plcDisplay').textContent = 'OFFLINE';
+        }
+    }
+
+    // =========================
+    // Initialize
+    // =========================
+    document.addEventListener('DOMContentLoaded', function() {
+        initializeCharts();
+        updateDateTime();
+        setInterval(updateDateTime, 1000);
+        addAlert('info', 'ระบบพร้อม', 'Smart Factory AI เริ่มต้นเรียบร้อยแล้ว');
+        startStatusPolling();
+    });
+
+    function updateDateTime() {
+        const now = new Date();
+        const thaiMonths = ['มกราคม','กุมภาพันธ์','มีนาคม','เมษายน','พฤษภาคม','มิถุนายน',
+                           'กรกฎาคม','สิงหาคม','กันยายน','ตุลาคม','พฤศจิกายน','ธันวาคม'];
+        document.getElementById('currentTime').textContent =
+            now.toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+        document.getElementById('currentDate').textContent =
+            `${now.getDate()} ${thaiMonths[now.getMonth()]} ${now.getFullYear() + 543}`;
+    }
+
+    // =========================
+    // Control Functions (Relay จริง)
+    // =========================
+    async function startProduction() {
+        if (systemState.emergency) {
+            addAlert('danger', 'ไม่สามารถเริ่มได้', 'กรุณาปลด Emergency Stop ก่อน');
+            return;
+        }
+
+        try {
+            await apiGet('/start'); // Relay จริง Pin 19
+            systemState.running = true;
+            systemState.startTime = Date.now();
+
+            document.getElementById('btnStart').disabled = true;
+            document.getElementById('btnStop').disabled = false;
+            document.getElementById('conveyor').classList.add('running');
+            document.getElementById('motor').classList.add('running');
+            document.getElementById('plcDisplay').textContent = 'RUNNING';
+
+            addAlert('success', 'เริ่มการผลิต', 'สั่ง Relay PIN 19 แล้ว');
+            producePartsLoop();
+            startContinuousChartUpdates();
+        } catch (e) {
+            addAlert('danger', 'START สำเร็จ', 'เรียก /start ได้');
+        }
+    }
+
+    async function stopProduction() {
+        try {
+            await apiGet('/stop'); // Relay จริง Pin 18
+            addAlert('info', 'หยุดการผลิต', 'สั่ง Relay PIN 18 แล้ว');
+        } catch (e) {
+            addAlert('danger', 'STOP ไม่สำเร็จ', 'เรียก /stop ไม่ได้ (แต่หยุดหน้าเว็บให้แล้ว)');
+        }
+
+        systemState.running = false;
+
+        if (systemState.productionInterval) clearTimeout(systemState.productionInterval);
+        if (systemState.chartUpdateInterval) {
+            clearInterval(systemState.chartUpdateInterval);
+            systemState.chartUpdateInterval = null;
+        }
+
+        document.getElementById('btnStart').disabled = false;
+        document.getElementById('btnStop').disabled = true;
+        document.getElementById('conveyor').classList.remove('running');
+        document.getElementById('motor').classList.remove('running');
+        document.getElementById('plcDisplay').textContent = 'STOPPED';
+    }
+
+    async function emergencyStop() {
+        try {
+            const res = await apiGet('/emergency'); // Relay จริง Pin 23 (toggle)
+            const txt = await res.text();
+
+            systemState.emergency = !systemState.emergency;
+            const btn = document.getElementById('btnEmergency');
+
+            if (systemState.emergency) {
+                systemState.running = false;
+                if (systemState.productionInterval) clearTimeout(systemState.productionInterval);
+                if (systemState.chartUpdateInterval) {
+                    clearInterval(systemState.chartUpdateInterval);
+                    systemState.chartUpdateInterval = null;
+                }
+
+                btn.classList.add('active');
+                document.getElementById('plcDisplay').textContent = 'E-STOP';
+                document.getElementById('led4').classList.add('error');
+                document.getElementById('conveyor').classList.remove('running');
+                document.getElementById('motor').classList.remove('running');
+                document.getElementById('btnStart').disabled = true;
+                document.getElementById('btnStop').disabled = true;
+
+                addAlert('danger', 'ฉุกเฉิน!', `สั่ง Relay PIN 23 แล้ว (${txt})`);
+            } else {
+                btn.classList.remove('active');
+                document.getElementById('plcDisplay').textContent = 'READY';
+                document.getElementById('led4').classList.remove('error');
+                document.getElementById('btnStart').disabled = false;
+                document.getElementById('btnStop').disabled = true;
+
+                addAlert('success', 'ปลด E-Stop', `ระบบพร้อมทำงาน (${txt})`);
+            }
+        } catch (e) {
+            addAlert('danger', 'E-STOP ไม่สำเร็จ', 'เรียก /emergency ไม่ได้');
+        }
+    }
+
+    function resetSystem() {
+        stopProduction();
+
+        systemState.running = false;
+        systemState.emergency = false;
+        systemState.speed = 50;
+        systemState.defectRate = 15;
+        systemState.partCounter = 0;
+        systemState.goodCount = 0;
+        systemState.badCount = 0;
+        systemState.productionInterval = null;
+        systemState.chartUpdateInterval = null;
+        systemState.startTime = null;
+
+        chartData = {
+            production: { time: [], good: [], bad: [] },
+            quality: { time: [], rate: [] },
+            defects: { scratch: 0, crack: 0, deform: 0, color: 0, size: 0 },
+            oee: { time: [], value: [] }
+        };
+
+        document.getElementById('goodCount').textContent = '0';
+        document.getElementById('ngCount').textContent = '0';
+        document.getElementById('totalParts').textContent = '0';
+        document.getElementById('goodParts').textContent = '0';
+        document.getElementById('defectParts').textContent = '0';
+        document.getElementById('qualityRate').textContent = '100%';
+        document.getElementById('productionRate').textContent = '0';
+        document.getElementById('oeeValue').textContent = '0%';
+        document.getElementById('plcDisplay').textContent = 'READY';
+
+        setPlcLed(1, false); setPlcLed(2, false); setPlcLed(3, false);
+        document.getElementById('btnEmergency').classList.remove('active');
+        document.getElementById('led4').classList.remove('error');
+
+        document.getElementById('speedSlider').value = 50;
+        document.getElementById('defectSlider').value = 15;
+        document.getElementById('speedValue').textContent = '50';
+        document.getElementById('defectValue').textContent = '15';
+
+        const gaugeFill = document.getElementById('gaugeFill');
+        gaugeFill.style.strokeDashoffset = '471';
+
+        initializeCharts();
+        addAlert('info', 'รีเซ็ตสำเร็จ', 'ข้อมูลทั้งหมดถูกล้างแล้ว');
+    }
+
+    function updateSpeed(value) {
+        systemState.speed = parseInt(value);
+        document.getElementById('speedValue').textContent = value;
+    }
+
+    function updateDefectRate(value) {
+        systemState.defectRate = parseInt(value);
+        document.getElementById('defectValue').textContent = value;
+    }
+
+    // =========================
+    // Production Logic (Simulation UI)
+    // =========================
+    function producePartsLoop() {
+        if (!systemState.running) return;
+
+        producePart();
+
+        const interval = 3000 / (systemState.speed / 50);
+        systemState.productionInterval = setTimeout(producePartsLoop, interval);
+    }
+
+    function producePart() {
+        systemState.partCounter++;
+        const isGood = Math.random() * 100 > systemState.defectRate;
+
+        const part = document.createElement('div');
+        part.className = `part ${isGood ? 'good' : 'bad'}`;
+        part.textContent = systemState.partCounter;
+        part.style.left = '10%';
+        part.dataset.quality = isGood ? 'good' : 'bad';
+
+        document.getElementById('productionLine').appendChild(part);
+        movePart(part, isGood);
+    }
+
+    function movePart(part, isGood) {
+        let position = 10;
+        const speed = systemState.speed / 50;
+
+        const moveInterval = setInterval(() => {
+            if (!systemState.running) {
+                clearInterval(moveInterval);
+                part.remove();
+                return;
+            }
+
+            position += 0.35 * speed;
+            part.style.left = position + '%';
+
+            if (position > 20 && position < 21) triggerSensor(1);
+            if (position > 48 && position < 49) { triggerSensor(2); inspectPart(isGood); }
+            if (position > 76 && position < 77) { triggerSensor(3); sortPart(part, isGood); clearInterval(moveInterval); }
+
+            if (position > 92) {
+                clearInterval(moveInterval);
+                part.remove();
+            }
+        }, 20);
+    }
+
+    // =========================
+    // Sensor Trigger -> LED จริง 0.7s
+    // /trigger?s=1|2|3
+    // s=1 => LED Pin 27
+    // s=2 => LED Pin 26
+    // s=3 => LED Pin 25
+    // =========================
+    function triggerSensor(num) {
+        const sensor = document.getElementById(`sensor${num}`);
+        sensor.classList.add('active');
+
+        setPlcLed(num, true);
+
+        fetch(`/trigger?s=${num}`).catch(() => {});
+
+        setTimeout(() => {
+            sensor.classList.remove('active');
+            setPlcLed(num, false);
+        }, 700);
+    }
+
+    function inspectPart(isGood) {
+        const camera = document.getElementById('camera');
+        camera.classList.add('scanning');
+
+        setTimeout(() => {
+            camera.classList.remove('scanning');
+
+            if (!isGood) {
+                const types = ['scratch', 'crack', 'deform', 'color', 'size'];
+                chartData.defects[types[Math.floor(Math.random() * types.length)]]++;
+            }
+        }, 1000);
+
+        const display = document.getElementById('plcDisplay');
+        const originalText = display.textContent;
+        display.textContent = isGood ? 'PASS ✓' : 'FAIL ✗';
+        setTimeout(() => display.textContent = originalText, 1000);
+    }
+
+    function sortPart(part, isGood) {
+        const actuator = isGood ? document.getElementById('actuatorGood') : document.getElementById('actuatorNG');
+        actuator.classList.add('active');
+
+        setTimeout(() => {
+            if (isGood) {
+                systemState.goodCount++;
+                document.getElementById('goodCount').textContent = systemState.goodCount;
+            } else {
+                systemState.badCount++;
+                document.getElementById('ngCount').textContent = systemState.badCount;
+            }
+
+            part.style.transition = 'all 0.9s cubic-bezier(0.34, 1.56, 0.64, 1)';
+            part.style.left = '91%';
+            part.style.top = isGood ? '68%' : '34%';
+            part.style.transform = 'scale(0.45)';
+            part.style.opacity = '0.15';
+
+            setTimeout(() => actuator.classList.remove('active'), 600);
+            setTimeout(() => part.remove(), 900);
+
+            updateMetrics();
+        }, 300);
+    }
+
+    function updateMetrics() {
+        const total = systemState.goodCount + systemState.badCount;
+        const quality = total > 0 ? (systemState.goodCount / total * 100).toFixed(1) : 100;
+
+        document.getElementById('totalParts').textContent = total;
+        document.getElementById('goodParts').textContent = systemState.goodCount;
+        document.getElementById('defectParts').textContent = systemState.badCount;
+        document.getElementById('qualityRate').textContent = quality + '%';
+
+        if (systemState.startTime) {
+            const elapsed = (Date.now() - systemState.startTime) / 1000 / 60;
+            const rate = elapsed > 0 ? (total / elapsed).toFixed(1) : 0;
+            document.getElementById('productionRate').textContent = rate;
+        }
+
+        const oee = (parseFloat(quality) * 0.94).toFixed(1);
+        document.getElementById('oeeValue').textContent = oee + '%';
+        updateOEEGauge(parseFloat(oee));
+
+        updateCharts();
+
+        if (quality < 70 && total > 10) {
+            addAlert('danger', 'คุณภาพต่ำ!', `คุณภาพลดลงเหลือ ${quality}%`);
+        } else if (quality < 85 && total > 15 && total % 15 === 0) {
+            addAlert('warning', 'คำเตือน', `คุณภาพอยู่ที่ ${quality}%`);
+        }
+    }
+
+    function updateOEEGauge(value) {
+        const circle = document.getElementById('gaugeFill');
+        const circumference = 471;
+        const offset = circumference - (value / 100) * circumference;
+        circle.style.strokeDashoffset = offset;
+    }
+
+    function startContinuousChartUpdates() {
+        if (systemState.chartUpdateInterval) clearInterval(systemState.chartUpdateInterval);
+
+        systemState.chartUpdateInterval = setInterval(() => {
+            if (systemState.running) {
+                if (chartData.production.time.length > 0) updateChartsAnimation();
+            }
+        }, 1000);
+    }
+
+    // =========================
+    // Charts
+    // =========================
+    function initializeCharts() {
+        const realtimeConfig = {
+            margin: { t: 20, r: 20, b: 40, l: 50 },
+            paper_bgcolor: '#0a0e1a',
+            plot_bgcolor: '#0f1419',
+            font: {
+                color: '#667eea',
+                size: 11,
+                family: 'Inter, SF Mono, sans-serif',
+                weight: 600
+            },
+            xaxis: {
+                title: { text: 'Time', font: { size: 10, color: '#00f5ff' } },
+                gridcolor: 'rgba(0, 245, 255, 0.15)',
+                showgrid: true,
+                zeroline: false,
+                color: '#00f5ff',
+                linecolor: 'rgba(0, 245, 255, 0.3)',
+                linewidth: 2
+            },
+            yaxis: {
+                title: { text: 'Count', font: { size: 10, color: '#00f5ff' } },
+                gridcolor: 'rgba(0, 245, 255, 0.15)',
+                showgrid: true,
+                zeroline: true,
+                zerolinecolor: 'rgba(0, 245, 255, 0.25)',
+                zerolinewidth: 2,
+                color: '#00f5ff',
+                linecolor: 'rgba(0, 245, 255, 0.3)',
+                linewidth: 2
+            },
+            showlegend: true,
+            legend: {
+                x: 0.02,
+                y: 0.98,
+                bgcolor: 'rgba(10, 14, 26, 0.9)',
+                bordercolor: 'rgba(0, 245, 255, 0.5)',
+                borderwidth: 2,
+                font: { size: 10, color: '#00f5ff', family: 'Inter, SF Mono' }
+            },
+            hovermode: 'x unified'
+        };
+
+        Plotly.newPlot('chartProduction', [
+            {
+                x: [],
+                y: [],
+                name: '✓ GOOD',
+                type: 'bar',
+                marker: { color: '#00ff88', line: { color: '#00cc66', width: 2 } },
+                text: [],
+                textposition: 'outside',
+                textfont: { color: '#00ff88', size: 10, family: 'SF Mono' },
+                hovertemplate: '<b>GOOD</b><br>Count: %{y}<extra></extra>'
+            },
+            {
+                x: [],
+                y: [],
+                name: '✗ NG',
+                type: 'bar',
+                marker: { color: '#ff0055', line: { color: '#cc0044', width: 2 } },
+                text: [],
+                textposition: 'outside',
+                textfont: { color: '#ff0055', size: 10, family: 'SF Mono' },
+                hovertemplate: '<b>NG</b><br>Count: %{y}<extra></extra>'
+            }
+        ], {
+            ...realtimeConfig,
+            barmode: 'group',
+            bargap: 0.2,
+            bargroupgap: 0.1
+        }, { responsive: true, displayModeBar: false });
+
+        Plotly.newPlot('chartQuality', [{
+            x: [], y: [],
+            name: 'QUALITY',
+            type: 'scatter',
+            mode: 'lines',
+            line: { color: '#00d9ff', width: 4, shape: 'spline', smoothing: 1.3 },
+            fill: 'tozeroy',
+            fillcolor: 'rgba(0, 217, 255, 0.25)'
+        }], {
+            ...realtimeConfig,
+            yaxis: { ...realtimeConfig.yaxis, title: {text: 'Quality %', font: {size: 10, color: '#00f5ff'}}, range: [0,100] }
+        }, { responsive: true, displayModeBar: false });
+
+        Plotly.newPlot('chartDefects', [{
+            type: 'barpolar',
+            r: [0,0,0,0,0],
+            theta: ['🔴 Scratch', '🟠 Crack', '🟡 Deform', '🟣 Color', '🔵 Size'],
+            name: 'DEFECTS',
+            marker: {
+                colors: ['#ff0055', '#ff6b00', '#ffd000', '#c800ff', '#00d9ff'],
+                line: { color: 'rgba(0, 245, 255, 0.8)', width: 3 }
+            },
+            hovertemplate: '<b>%{theta}</b><br>Count: %{r}<extra></extra>'
+        }], {
+            margin: { t: 15, r: 15, b: 15, l: 15 },
+            paper_bgcolor: '#0a0e1a',
+            font: { color: '#00f5ff', size: 11, family: 'Inter, SF Mono', weight: 600 },
+            polar: {
+                bgcolor: '#0f1419',
+                radialaxis: {
+                    gridcolor: 'rgba(0, 245, 255, 0.15)',
+                    color: '#00f5ff',
+                    linecolor: 'rgba(0, 245, 255, 0.3)',
+                    linewidth: 2,
+                    tickfont: { size: 9 }
+                },
+                angularaxis: {
+                    gridcolor: 'rgba(0, 245, 255, 0.15)',
+                    color: '#00f5ff',
+                    linecolor: 'rgba(0, 245, 255, 0.3)',
+                    linewidth: 2,
+                    tickfont: { size: 10 }
+                }
+            },
+            showlegend: false
+        }, { responsive: true, displayModeBar: false });
+
+        Plotly.newPlot('chartOEE', [{
+            x: [], y: [],
+            name: 'OEE',
+            type: 'scatter',
+            mode: 'lines',
+            line: { color: '#a855f7', width: 4, shape: 'spline', smoothing: 1.3 },
+            fill: 'tozeroy',
+            fillcolor: 'rgba(168, 85, 247, 0.25)'
+        }], {
+            ...realtimeConfig,
+            yaxis: { ...realtimeConfig.yaxis, title: {text: 'OEE %', font: {size: 10, color: '#00f5ff'}}, range: [0,100] }
+        }, { responsive: true, displayModeBar: false });
+    }
+
+    function updateCharts() {
+        const timestamp = new Date().toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+
+        chartData.production.time.push(timestamp);
+        chartData.production.good.push(systemState.goodCount);
+        chartData.production.bad.push(systemState.badCount);
+
+        if (chartData.production.time.length > 20) {
+            chartData.production.time.shift();
+            chartData.production.good.shift();
+            chartData.production.bad.shift();
+        }
+
+        Plotly.animate('chartProduction', {
+            data: [
+                { x: chartData.production.time, y: chartData.production.good, text: chartData.production.good.map(v => v > 0 ? v : ''), textposition: 'outside' },
+                { x: chartData.production.time, y: chartData.production.bad,  text: chartData.production.bad.map(v => v > 0 ? v : ''),  textposition: 'outside' }
+            ]
+        }, { transition: { duration: 300, easing: 'cubic-in-out' }, frame: { duration: 300 } });
+
+        const quality = systemState.goodCount + systemState.badCount > 0
+            ? (systemState.goodCount / (systemState.goodCount + systemState.badCount) * 100)
+            : 100;
+
+        chartData.quality.time.push(timestamp);
+        chartData.quality.rate.push(quality);
+
+        if (chartData.quality.time.length > 20) {
+            chartData.quality.time.shift();
+            chartData.quality.rate.shift();
+        }
+
+        Plotly.animate('chartQuality', {
+            data: [{ x: chartData.quality.time, y: chartData.quality.rate }]
+        }, { transition: { duration: 300, easing: 'cubic-in-out' }, frame: { duration: 300 } });
+
+        Plotly.animate('chartDefects', {
+            data: [{
+                r: [
+                    chartData.defects.scratch || 0,
+                    chartData.defects.crack || 0,
+                    chartData.defects.deform || 0,
+                    chartData.defects.color || 0,
+                    chartData.defects.size || 0
+                ]
+            }]
+        }, { transition: { duration: 300, easing: 'cubic-in-out' }, frame: { duration: 300 } });
+
+        const oeeValue = parseFloat(document.getElementById('oeeValue').textContent);
+        chartData.oee.time.push(timestamp);
+        chartData.oee.value.push(oeeValue);
+
+        if (chartData.oee.time.length > 20) {
+            chartData.oee.time.shift();
+            chartData.oee.value.shift();
+        }
+
+        Plotly.animate('chartOEE', {
+            data: [{ x: chartData.oee.time, y: chartData.oee.value }]
+        }, { transition: { duration: 300, easing: 'cubic-in-out' }, frame: { duration: 300 } });
+    }
+
+    function updateChartsAnimation() {
+        if (chartData.production.time.length > 0) {
+            Plotly.animate('chartProduction', {
+                data: [
+                    { x: chartData.production.time, y: chartData.production.good, text: chartData.production.good.map(v => v > 0 ? v : ''), textposition: 'outside' },
+                    { x: chartData.production.time, y: chartData.production.bad,  text: chartData.production.bad.map(v => v > 0 ? v : ''),  textposition: 'outside' }
+                ]
+            }, { transition: { duration: 200, easing: 'linear' }, frame: { duration: 200 } });
+        }
+
+        if (chartData.quality.time.length > 0) {
+            Plotly.animate('chartQuality', {
+                data: [{ x: chartData.quality.time, y: chartData.quality.rate }]
+            }, { transition: { duration: 200, easing: 'linear' }, frame: { duration: 200 } });
+        }
+
+        if (chartData.oee.time.length > 0) {
+            Plotly.animate('chartOEE', {
+                data: [{ x: chartData.oee.time, y: chartData.oee.value }]
+            }, { transition: { duration: 200, easing: 'linear' }, frame: { duration: 200 } });
+        }
+    }
+
+    // =========================
+    // Alerts
+    // =========================
+    function addAlert(type, title, message) {
+        const container = document.getElementById('alertsContainer');
+        const alert = document.createElement('div');
+        alert.className = `alert ${type}`;
+        alert.innerHTML = `
+            <div class="alert-title">${title}</div>
+            <div class="alert-message">${message}</div>
+        `;
+
+        container.insertBefore(alert, container.firstChild);
+
+        setTimeout(() => {
+            alert.style.animation = 'slideIn 0.5s cubic-bezier(0.4, 0, 0.2, 1) reverse';
+            setTimeout(() => alert.remove(), 500);
+        }, 7000);
+
+        while (container.children.length > 5) container.lastChild.remove();
+    }
+</script>
+
+</body>
+</html>
