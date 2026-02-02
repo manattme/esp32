@@ -1,0 +1,204 @@
+#include <WiFi.h>
+#include <LittleFS.h>
+#include <ESPAsyncWebServer.h>
+
+// ===== Relay Pins (ตามที่ต้องการ) =====
+#define RELAY_EMERGENCY 23  // emergencyStop
+#define RELAY_STOP      18  // stopProduction
+#define RELAY_START     19  // startProduction
+
+// ===== LED จริงบนบอร์ด (ตามที่ต้องการ) =====
+// led1(sensor1) -> pin27, led2(sensor2) -> pin26, led3(sensor3) -> pin25
+const int LED1_S1 = 27;
+const int LED2_S2 = 26;
+const int LED3_S3 = 25;
+
+// LED READY
+#define LED_READY 32
+
+// WiFi
+const char* ssid = "iPhoneHotspot";
+const char* password = "0405sunny";
+
+AsyncWebServer server(80);
+
+// สถานะระบบ
+volatile bool running = false;
+volatile bool emergency = false;
+
+// ===== Timer สำหรับ Pulse LED 0.7s =====
+static uint32_t ledOffAt1 = 0;
+static uint32_t ledOffAt2 = 0;
+static uint32_t ledOffAt3 = 0;
+
+void pulseLed(uint8_t ch) {
+  const uint32_t now = millis();
+  const uint32_t durationMs = 700;
+
+  if (ch == 1) {
+    digitalWrite(LED1_S1, HIGH);
+    ledOffAt1 = now + durationMs;
+  } else if (ch == 2) {
+    digitalWrite(LED2_S2, HIGH);
+    ledOffAt2 = now + durationMs;
+  } else if (ch == 3) {
+    digitalWrite(LED3_S3, HIGH);
+    ledOffAt3 = now + durationMs;
+  }
+}
+
+void applyRelayStates() {
+  // แนวคิดที่ปลอดภัย: ถ้า emergency -> ตัด start/stop
+  if (emergency) {
+    digitalWrite(RELAY_EMERGENCY, LOW);
+    digitalWrite(RELAY_START, HIGH);
+    digitalWrite(RELAY_STOP, HIGH);
+    running = false;
+    return;
+  }
+
+  digitalWrite(RELAY_EMERGENCY, HIGH);
+
+  // running = true -> เปิด START (19), ปิด STOP (18)
+  if (running) {
+    digitalWrite(RELAY_START, LOW);
+    digitalWrite(RELAY_STOP, HIGH);
+  } else {
+    // running = false -> เปิด STOP (18), ปิด START (19)
+    digitalWrite(RELAY_START, HIGH);
+    digitalWrite(RELAY_STOP, LOW);
+  }
+}
+
+void setup() {
+  Serial.begin(115200);
+
+  if (!LittleFS.begin(true)) {
+    Serial.println("LittleFS Mount Failed");
+    return;
+  }
+
+  // Relay
+  pinMode(RELAY_EMERGENCY, OUTPUT);
+  pinMode(RELAY_STOP, OUTPUT);
+  pinMode(RELAY_START, OUTPUT);
+  digitalWrite(RELAY_EMERGENCY, HIGH);
+  digitalWrite(RELAY_STOP, HIGH);
+  digitalWrite(RELAY_START, HIGH);
+
+  // LEDs
+  pinMode(LED1_S1, OUTPUT);
+  pinMode(LED2_S2, OUTPUT);
+  pinMode(LED3_S3, OUTPUT);
+  digitalWrite(LED1_S1, LOW);
+  digitalWrite(LED2_S2, LOW);
+  digitalWrite(LED3_S3, LOW);
+
+  pinMode(LED_READY, OUTPUT);
+  digitalWrite(LED_READY, LOW);
+
+  // WiFi
+  WiFi.begin(ssid, password);
+  Serial.print("Connecting WiFi");
+  while (WiFi.status() != WL_CONNECTED) {
+    delay(500);
+    Serial.print(".");
+  }
+  Serial.println("\nWiFi connected");
+  Serial.println(WiFi.localIP());
+  digitalWrite(LED_READY, HIGH);
+
+  // Serve UI
+  server.on("/", HTTP_GET, [](AsyncWebServerRequest *request) {
+    request->send(LittleFS, "/index.html", "text/html");
+  });
+  server.serveStatic("/", LittleFS, "/");
+
+  // ===== Endpoint: startProduction -> Relay Pin 19 =====
+  server.on("/start", HTTP_GET, [](AsyncWebServerRequest *request){
+    if (!emergency) {
+      running = true;
+      applyRelayStates();
+      request->send(200, "text/plain", "START -> RELAY 19");
+    } else {
+      request->send(409, "text/plain", "EMERGENCY ACTIVE");
+    }
+  });
+
+  // ===== Endpoint: stopProduction -> Relay Pin 18 =====
+  server.on("/stop", HTTP_GET, [](AsyncWebServerRequest *request){
+    running = false;
+    applyRelayStates();
+    request->send(200, "text/plain", "STOP -> RELAY 18");
+  });
+
+  // ===== Endpoint: emergencyStop -> Relay Pin 23 (toggle) =====
+  server.on("/emergency", HTTP_GET, [](AsyncWebServerRequest *request){
+    emergency = !emergency;
+    applyRelayStates();
+    request->send(200, "text/plain", emergency ? "E-STOP ON -> RELAY 23" : "E-STOP OFF");
+  });
+
+  // ===== Endpoint: triggerSensor จาก Dashboard -> Pulse LED จริง 0.7s =====
+  // /trigger?s=1|2|3
+  server.on("/trigger", HTTP_GET, [](AsyncWebServerRequest *request){
+    if (!request->hasParam("s")) {
+      request->send(400, "text/plain", "Missing param s");
+      return;
+    }
+    int s = request->getParam("s")->value().toInt();
+    if (s < 1 || s > 3) {
+      request->send(400, "text/plain", "s must be 1..3");
+      return;
+    }
+    pulseLed((uint8_t)s);
+    request->send(200, "text/plain", "TRIGGER OK");
+  });
+
+  // ===== Status endpoint (ให้หน้าเว็บอ่านได้) =====
+  server.on("/status", HTTP_GET, [](AsyncWebServerRequest *request){
+    // สถานะ LED จริง
+    bool l1 = digitalRead(LED1_S1);
+    bool l2 = digitalRead(LED2_S2);
+    bool l3 = digitalRead(LED3_S3);
+
+    String json = "{";
+    json += "\"running\":"   + String(running ? "true" : "false") + ",";
+    json += "\"emergency\":" + String(emergency ? "true" : "false") + ",";
+    json += "\"r23\":" + String(digitalRead(RELAY_EMERGENCY) ? "true" : "false") + ",";
+    json += "\"r18\":" + String(digitalRead(RELAY_STOP) ? "true" : "false") + ",";
+    json += "\"r19\":" + String(digitalRead(RELAY_START) ? "true" : "false") + ",";
+    json += "\"led1\":" + String(l1 ? "true" : "false") + ",";
+    json += "\"led2\":" + String(l2 ? "true" : "false") + ",";
+    json += "\"led3\":" + String(l3 ? "true" : "false");
+    json += "}";
+    request->send(200, "application/json", json);
+  });
+
+  // ค่าเริ่มต้น: ยังไม่ running และไม่ emergency
+  running = false;
+  emergency = false;
+  applyRelayStates();
+
+  server.begin();
+}
+
+void loop() {
+  // ปิด LED ตามเวลา (0.7s) แบบ non-blocking
+  const uint32_t now = millis();
+
+  if (ledOffAt1 && (int32_t)(now - ledOffAt1) >= 0) {
+    digitalWrite(LED1_S1, LOW);
+    ledOffAt1 = 0;
+  }
+  if (ledOffAt2 && (int32_t)(now - ledOffAt2) >= 0) {
+    digitalWrite(LED2_S2, LOW);
+    ledOffAt2 = 0;
+  }
+  if (ledOffAt3 && (int32_t)(now - ledOffAt3) >= 0) {
+    digitalWrite(LED3_S3, LOW);
+    ledOffAt3 = 0;
+  }
+
+  delay(5);
+}
